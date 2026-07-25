@@ -1,0 +1,155 @@
+QR-CODE-FRANKEN – WIE DIE DATENHALTUNG FUNKTIONIERT
+=====================================================
+
+BRAUCHT MAN HIER EINE DATENBANK?
+---------------------------------
+Kurz: Ja, in diesem Fall schon – und zwar aus einem einzigen Grund.
+
+Ein QR-Code soll auf dem HANDY einer anderen Person gescannt werden können,
+nicht nur auf dem Gerät, auf dem die Liste erstellt wurde. Wenn die Liste
+nur im localStorage des Browsers läge (wie in js/storage.js angelegt),
+könnte niemand außer dir selbst sie sehen – der QR-Code würde auf einem
+fremden Handy ins Leere zeigen, weil dort kein localStorage-Eintrag existiert.
+
+Damit der QR-Code überall funktioniert, muss hinter dem Link (view.html?id=...)
+ein zentraler Ort stehen, den JEDES Gerät abfragen kann. Das ist per
+Definition eine Datenbank (bzw. ein Backend) im Internet.
+
+Die gute Nachricht: Das Projekt hatte bereits einen Supabase-Zugang fertig
+verdrahtet (js/supabase.js) – Supabase ist eine gehostete Postgres-Datenbank
+mit einer REST-Schnittstelle, die man direkt aus dem Browser ansprechen kann,
+ganz ohne eigenen Server. Genau das nutzt dieses Projekt jetzt.
+
+ALTERNATIVE OHNE DATENBANK (falls du sie später doch nicht willst)
+--------------------------------------------------------------------
+Man könnte Titel + Einträge direkt als Text (z. B. JSON, base64-kodiert) in
+den QR-Code selbst packen, ohne jede Datenbank. Das funktioniert auch offline.
+ABER: Ein QR-Code ist ein starres Bild – man kann seinen Inhalt nicht mehr
+nachträglich ändern. "Bearbeiten" würde dann bedeuten: neue Liste, neuer
+QR-Code, alte gedruckte/gespeicherte Codes zeigen weiter die alten Daten.
+Das widerspricht der Anforderung "man soll die Liste bearbeiten können",
+weshalb hier eine Datenbank die sinnvollere Wahl ist.
+
+WIE ES JETZT AUFGEBAUT IST
+-----------------------------
+- Tabelle "listen" in Supabase mit den Spalten:
+    id          uuid   – eindeutige ID der Liste, steckt in der URL
+    titel       text   – der Titel der Liste
+    daten       jsonb  – die Einträge als Array, z. B. ["Milch", "Brot"]
+    edit_token  uuid   – ein "Geheimnis", das zum Bearbeiten nötig ist
+    created_at  timestamptz
+
+- Der QR-Code zeigt auf:      view.html?id=<id>              (nur Lesen)
+- Der Bearbeiten-Link lautet: view.html?id=<id>&token=<edit_token>
+
+Wer nur die id kennt (z. B. durch Scannen des QR-Codes), sieht die Liste,
+kann sie aber NICHT verändern. Nur wer zusätzlich den token kennt (den nur
+die Person bekommt, die die Liste erstellt hat), sieht den "Bearbeiten"-Button.
+Es gibt also bewusst keinen Login/Account – der Bearbeiten-Link ist quasi
+dein Passwort. Das ist ausreichend für eine private Einkaufs-/To-do-Liste,
+aber kein Hochsicherheitssystem (wer den Bearbeiten-Link kennt/errät, kann
+ändern). Für mehr Sicherheit bräuchte man echte Nutzerkonten (Supabase Auth).
+
+DATENBANK EINRICHTEN (EINMALIG)
+-----------------------------------
+1. Auf https://supabase.com im Projekt "hgmetiaknofkdhmvhwke" einloggen
+   (das Projekt, dessen URL/Key schon in js/supabase.js steht).
+2. Im Menü links auf "SQL Editor" klicken, neue Query anlegen.
+3. Den folgenden SQL-Block komplett einfügen und ausführen (RUN).
+   Er legt die Tabelle an UND sorgt dafür, dass:
+     - jeder die Liste lesen kann (titel, daten – aber NICHT edit_token),
+     - niemand die Tabelle direkt verändern kann,
+     - Erstellen/Bearbeiten nur über zwei kontrollierte Funktionen läuft,
+       die die id + den edit_token serverseitig prüfen.
+
+HINWEIS: Diese Datei enthaelt den SQL-Block nur zur Doku. Zum Ausfuehren
+bitte die Datei supabase_setup.sql verwenden (dort ist die aktuelle,
+gegen bereits existierende Tabellen abgesicherte Version).
+
+--------------------------------------------------------------------
+create extension if not exists pgcrypto;
+
+create table if not exists public.listen (
+    id     uuid primary key default gen_random_uuid(),
+    titel  text not null,
+    daten  jsonb not null default '[]'::jsonb
+);
+
+-- Falls "listen" schon vorher existierte, legt CREATE TABLE IF NOT EXISTS
+-- oben nichts an. Diese zwei Zeilen stellen sicher, dass die Spalten in
+-- JEDEM Fall vorhanden sind.
+alter table public.listen add column if not exists edit_token uuid not null default gen_random_uuid();
+alter table public.listen add column if not exists created_at timestamptz not null default now();
+
+alter table public.listen enable row level security;
+
+drop policy if exists "select_public" on public.listen;
+create policy "select_public" on public.listen
+    for select using (true);
+
+-- Direkter Zugriff auf die Tabelle wird gesperrt bzw. eingeschränkt.
+-- edit_token ist absichtlich NICHT in der Spaltenliste, damit ihn
+-- niemand einfach per SELECT auslesen kann.
+revoke all on public.listen from anon, authenticated;
+grant select (id, titel, daten, created_at) on public.listen to anon, authenticated;
+
+-- Anlegen einer neuen Liste (gibt inkl. edit_token die volle Zeile zurück,
+-- nur einmalig direkt nach dem Erstellen sichtbar für den Ersteller).
+create or replace function public.create_list(p_titel text, p_daten jsonb)
+returns public.listen
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    v_row public.listen;
+begin
+    insert into public.listen (titel, daten)
+    values (p_titel, p_daten)
+    returning * into v_row;
+
+    return v_row;
+end;
+$$;
+
+grant execute on function public.create_list(text, jsonb) to anon, authenticated;
+
+-- Bearbeiten einer Liste: nur wenn id UND edit_token übereinstimmen.
+create or replace function public.update_list(
+    p_id uuid, p_token uuid, p_titel text, p_daten jsonb
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+    update public.listen
+    set titel = p_titel,
+        daten = p_daten
+    where id = p_id
+      and edit_token = p_token;
+
+    if not found then
+        raise exception 'Ungueltige ID oder Bearbeitungs-Token.';
+    end if;
+end;
+$$;
+
+grant execute on function public.update_list(uuid, uuid, text, jsonb) to anon, authenticated;
+--------------------------------------------------------------------
+
+4. Fertig. Die Website (js/supabase.js) ruft genau diese beiden Funktionen
+   (create_list, update_list) sowie einen normalen SELECT für die Anzeige auf.
+   Es muss nichts im Code angepasst werden – nur dieses SQL einmal ausführen.
+
+WARUM NICHT EINFACH "using (true)" FÜR UPDATE?
+-------------------------------------------------
+Der naheliegende, einfachere Weg wäre eine simple Update-Regel gewesen, die
+jedem das Ändern erlaubt, solange die App im JavaScript vorher den
+edit_token vergleicht. Das ist aber keine echte Sicherheit: Der Supabase-Key
+im Code ist öffentlich (jeder kann ihn im Quelltext sehen), jemand könnte
+also direkt eigene Anfragen an die Datenbank schicken und die
+JavaScript-Prüfung komplett umgehen. Die Prüfung "passt id zu edit_token?"
+muss deswegen IN der Datenbank passieren (in der Funktion update_list),
+nicht nur im Browser. Deshalb der etwas längere SQL-Block oben.

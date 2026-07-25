@@ -1,0 +1,103 @@
+/* ==========================
+   Komponenten
+   ========================== */
+
+/* Buttons */
+
+.btn-primary,
+.btn-secondary {
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.remove-item {
+    padding: 0 0.6rem;
+    color: #dc2626;
+    font-weight: bold;
+}
+
+/* Formulare */
+
+label {
+    font-weight: bold;
+    margin-top: 0.5rem;
+}
+
+input[type="text"] {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.subtitle {
+    color: #4b5563;
+}
+
+.items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.item-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.item-row .item-input {
+    flex: 1;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Karten */
+
+.result,
+#edit-form {
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+/* Liste */
+
+#liste li {
+    padding: 0.5rem;
+    background: #f3f4f6;
+    border-radius: 6px;
+}
+
+.edit-hint {
+    font-size: 0.9rem;
+    color: #b45309;
+}
+
+#save-status {
+    font-size: 0.9rem;
+}
+
+/* Modale Fenster */
+
+
+/* QR-Code-Anzeige */

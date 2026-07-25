@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR-Code-Franken</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+    <main id="app">
+
+        <h1>QR-Code-Franken</h1>
+        <p class="subtitle">Erstelle eine Liste und teile sie per QR-Code.</p>
+
+        <form id="list-form">
+
+            <label for="list-title">Titel</label>
+            <input
+                type="text"
+                id="list-title"
+                placeholder="z. B. Einkaufsliste"
+                required>
+
+            <label>Einträge</label>
+            <div id="items" class="items">
+                <div class="item-row">
+                    <input type="text" class="item-input" placeholder="Eintrag" required>
+                    <button type="button" class="remove-item" aria-label="Eintrag entfernen">✕</button>
+                </div>
+            </div>
+
+            <button type="button" id="add-item-btn" class="btn-secondary">
+                + Eintrag hinzufügen
+            </button>
+
+            <button type="submit" id="generate-btn" class="btn-primary">
+                QR-Code erzeugen
+            </button>
+
+        </form>
+
+        <div id="result" class="result hidden">
+
+            <div id="qr-code"></div>
+
+            <p>
+                <strong>QR-Code / Ansicht-Link:</strong><br>
+                <a id="view-link" target="_blank" rel="noopener"></a>
+            </p>
+
+            <p class="edit-hint">
+                <strong>Bearbeitungs-Link (privat, nicht weitergeben!):</strong><br>
+                <a id="edit-link" target="_blank" rel="noopener"></a>
+            </p>
+
+        </div>
+
+    </main>
+
+    <!-- Bibliotheken -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Eigene JavaScript-Dateien -->
+    <script type="module" src="js/app.js"></script>
+
+</body>
+</html>

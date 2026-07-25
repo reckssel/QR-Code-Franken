@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Liste</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+
+</head>
+<body>
+
+<main id="app">
+
+    <h1 id="titel"></h1>
+
+    <ul id="liste"></ul>
+
+    <div id="edit-controls" class="hidden">
+        <button type="button" id="edit-btn" class="btn-secondary">Liste bearbeiten</button>
+    </div>
+
+    <form id="edit-form" class="hidden">
+
+        <label for="edit-title">Titel</label>
+        <input type="text" id="edit-title" required>
+
+        <label>Einträge</label>
+        <div id="edit-items" class="items"></div>
+
+        <button type="button" id="edit-add-item-btn" class="btn-secondary">
+            + Eintrag hinzufügen
+        </button>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Speichern</button>
+            <button type="button" id="cancel-edit-btn" class="btn-secondary">Abbrechen</button>
+        </div>
+
+        <p id="save-status"></p>
+
+    </form>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module" src="js/view.js"></script>
+
+</body>
+</html>
