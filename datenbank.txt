@@ -39,16 +39,23 @@ WIE ES JETZT AUFGEBAUT IST
     edit_token  uuid   – ein "Geheimnis", das zum Bearbeiten nötig ist
     created_at  timestamptz
 
-- Der QR-Code zeigt auf:      view.html?id=<id>              (nur Lesen)
-- Der Bearbeiten-Link lautet: view.html?id=<id>&token=<edit_token>
+- Der QR-Code zeigt auf:  view.html?id=<id>&token=<edit_token>  (bearbeitbar!)
+- Optional gibt es zusätzlich einen Nur-Lese-Link zum separaten Teilen:
+  view.html?id=<id>                                              (nur Lesen)
 
-Wer nur die id kennt (z. B. durch Scannen des QR-Codes), sieht die Liste,
-kann sie aber NICHT verändern. Nur wer zusätzlich den token kennt (den nur
-die Person bekommt, die die Liste erstellt hat), sieht den "Bearbeiten"-Button.
-Es gibt also bewusst keinen Login/Account – der Bearbeiten-Link ist quasi
-dein Passwort. Das ist ausreichend für eine private Einkaufs-/To-do-Liste,
-aber kein Hochsicherheitssystem (wer den Bearbeiten-Link kennt/errät, kann
-ändern). Für mehr Sicherheit bräuchte man echte Nutzerkonten (Supabase Auth).
+WICHTIG (bewusste Design-Entscheidung, geändert auf Wunsch):
+Der QR-Code selbst enthält jetzt den edit_token. Das heißt: JEDER, der den
+QR-Code scannt, kann die Liste direkt bearbeiten – nicht nur der Ersteller.
+Das ist praktisch für gemeinsam genutzte Listen (z. B. eine Einkaufsliste,
+die die ganze Familie am Kühlschrank scannt und ändert), aber es gibt
+keinerlei Zugriffskontrolle mehr über den QR-Code hinaus: Wer das Bild
+sieht oder fotografiert, kann ändern. Es gibt bewusst keinen Login/Account.
+Falls du später doch getrennte Rechte willst (Scannen = nur lesen,
+separater Link = bearbeiten), einfach in js/ui.js in generateQRCode()
+wieder viewUrl statt editUrl übergeben – der Code für beide Varianten ist
+noch vorhanden. Für "echte" Sicherheit (z. B. nur bestimmte Personen dürfen
+bearbeiten) bräuchte man echte Nutzerkonten (Supabase Auth) statt eines
+Tokens im Link.
 
 DATENBANK EINRICHTEN (EINMALIG)
 -----------------------------------

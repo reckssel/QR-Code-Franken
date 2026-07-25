@@ -79,13 +79,13 @@ export function initUI() {
             window.location.href
         ).toString();
 
-        generateQRCode(viewUrl, qrCode);
-
-        viewLink.href = viewUrl;
-        viewLink.textContent = viewUrl;
+        generateQRCode(editUrl, qrCode);
 
         editLink.href = editUrl;
         editLink.textContent = editUrl;
+
+        viewLink.href = viewUrl;
+        viewLink.textContent = viewUrl;
 
         result.classList.remove("hidden");
     });
