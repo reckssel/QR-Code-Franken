@@ -45,7 +45,10 @@ $$;
 
 grant execute on function public.create_list(text, jsonb) to anon, authenticated;
 
--- Bearbeiten einer Liste: nur wenn id UND edit_token uebereinstimmen.
+-- Bearbeiten einer Liste: entweder mit passendem edit_token (anonymes
+-- Bearbeiten über QR-Code/Link) ODER als eingeloggter Account (Dashboard
+-- unter dashboard.html – dort duerfen angemeldete Nutzer alle Listen
+-- verwalten, ganz ohne Token).
 create or replace function public.update_list(
     p_id uuid, p_token uuid, p_titel text, p_daten jsonb
 )
@@ -59,7 +62,7 @@ begin
     set titel = p_titel,
         daten = p_daten
     where id = p_id
-      and edit_token = p_token;
+      and (edit_token = p_token or auth.uid() is not null);
 
     if not found then
         raise exception 'Ungueltige ID oder Bearbeitungs-Token.';
@@ -124,7 +127,8 @@ left join lateral (
 
 grant select on public.listen_public to anon, authenticated;
 
--- Liste komplett loeschen: nur mit passendem Bearbeitungs-Token.
+-- Liste komplett loeschen: mit passendem Bearbeitungs-Token ODER als
+-- eingeloggter Account (siehe update_list).
 create or replace function public.delete_list(p_id uuid, p_token uuid)
 returns void
 language plpgsql
@@ -134,7 +138,7 @@ as $$
 begin
     delete from public.listen
     where id = p_id
-      and edit_token = p_token;
+      and (edit_token = p_token or auth.uid() is not null);
 
     if not found then
         raise exception 'Ungueltige ID oder Bearbeitungs-Token.';
@@ -162,7 +166,7 @@ begin
 
     if not exists (
         select 1 from public.listen
-        where id = p_list_id and edit_token = p_token
+        where id = p_list_id and (edit_token = p_token or auth.uid() is not null)
     ) then
         raise exception 'Ungueltige ID oder Bearbeitungs-Token.';
     end if;
@@ -193,7 +197,7 @@ as $$
 begin
     if not exists (
         select 1 from public.listen
-        where id = p_list_id and edit_token = p_token
+        where id = p_list_id and (edit_token = p_token or auth.uid() is not null)
     ) then
         raise exception 'Ungueltige ID oder Bearbeitungs-Token.';
     end if;

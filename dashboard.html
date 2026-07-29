@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alle Listen – QR-Code-Franken</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+    <main id="app">
+
+        <h1>Alle Listen</h1>
+        <p class="subtitle"><a href="index.html">← Zurück zur Startseite</a></p>
+
+        <form id="login-form" class="card">
+
+            <label for="auth-email">E-Mail</label>
+            <input type="email" id="auth-email" required autocomplete="email">
+
+            <label for="auth-password">Passwort</label>
+            <input type="password" id="auth-password" required autocomplete="current-password">
+
+            <div class="form-actions">
+                <button type="submit" id="login-btn" class="btn-primary">Anmelden</button>
+                <button type="button" id="signup-btn" class="btn-secondary">Registrieren</button>
+            </div>
+
+            <p id="auth-status" class="empty-state"></p>
+
+        </form>
+
+        <section id="dashboard" class="hidden">
+
+            <div class="list-card-header">
+                <p class="toolbar-text">Angemeldet – Verwaltung aller Listen</p>
+                <button type="button" id="logout-btn" class="btn-secondary">Abmelden</button>
+            </div>
+
+            <div id="lists-container" class="lists-container"></div>
+            <p id="lists-empty" class="empty-state hidden">Noch keine Listen vorhanden.</p>
+
+        </section>
+
+        <datalist id="tag-suggestions"></datalist>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/dashboard-app.js"></script>
+
+</body>
+</html>
