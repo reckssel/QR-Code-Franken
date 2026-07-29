@@ -56,3 +56,90 @@ export async function updateList(id, token, titel, daten) {
 
     return true;
 }
+
+// Lädt alle Listen inkl. ihrer zugewiesenen Tags für die Hauptseite.
+export async function getAllLists() {
+
+    const { data, error } = await supabase
+        .from("listen_public")
+        .select("id, titel, daten, tags, created_at")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return data;
+}
+
+// Löscht eine Liste vollständig. Läuft über die DB-Funktion delete_list,
+// die wie update_list id + edit_token prüft.
+export async function deleteList(id, token) {
+
+    const { error } = await supabase
+        .rpc("delete_list", {
+            p_id: id,
+            p_token: token
+        });
+
+    if (error) {
+        console.error(error);
+        return false;
+    }
+
+    return true;
+}
+
+// Lädt alle bereits existierenden Tags (für Vorschläge/Autovervollständigung).
+export async function getAllTags() {
+
+    const { data, error } = await supabase
+        .from("tags")
+        .select("id, name")
+        .order("name");
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return data;
+}
+
+// Weist einer Liste einen Tag zu (legt ihn bei Bedarf an).
+export async function addTagToList(listId, token, tagName) {
+
+    const { data, error } = await supabase
+        .rpc("add_tag_to_list", {
+            p_list_id: listId,
+            p_token: token,
+            p_tag_name: tagName
+        });
+
+    if (error) {
+        console.error(error);
+        return null;
+    }
+
+    return data;
+}
+
+// Entfernt die Zuweisung eines Tags von einer Liste (der Tag bleibt
+// für andere Listen erhalten).
+export async function removeTagFromList(listId, token, tagId) {
+
+    const { error } = await supabase
+        .rpc("remove_tag_from_list", {
+            p_list_id: listId,
+            p_token: token,
+            p_tag_id: tagId
+        });
+
+    if (error) {
+        console.error(error);
+        return false;
+    }
+
+    return true;
+}

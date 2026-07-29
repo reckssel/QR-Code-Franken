@@ -1,5 +1,7 @@
 import { generateQRCode, downloadQRCode } from "./qr-generator.js";
 import { saveList } from "./supabase.js";
+import { rememberList } from "./storage.js";
+import { refreshDashboard } from "./dashboard.js";
 
 export function initUI() {
 
@@ -68,6 +70,9 @@ export function initUI() {
             alert("Liste konnte nicht gespeichert werden.");
             return;
         }
+
+        rememberList(liste.id, liste.titel, liste.edit_token);
+        refreshDashboard();
 
         const viewUrl = new URL(
             `view.html?id=${liste.id}`,

@@ -1,4 +1,5 @@
 import { getList, updateList } from "./supabase.js";
+import { rememberList } from "./storage.js";
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
@@ -96,6 +97,7 @@ async function init() {
 
     if (token) {
         editControls.classList.remove("hidden");
+        rememberList(id, currentTitel, token);
     }
 }
 
