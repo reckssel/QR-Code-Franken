@@ -1,4 +1,4 @@
-import { generateQRCode } from "./qr-generator.js";
+import { generateQRCode, downloadQRCode } from "./qr-generator.js";
 import { saveList } from "./supabase.js";
 
 export function initUI() {
@@ -81,6 +81,13 @@ export function initUI() {
 
         generateQRCode(editUrl, qrCode);
 
+        const dateiname = titel
+            .toLowerCase()
+            .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "liste";
+        downloadQRCode(qrCode, `${dateiname}-qr-code.png`);
+
         editLink.href = editUrl;
         editLink.textContent = editUrl;
 
@@ -88,6 +95,25 @@ export function initUI() {
         viewLink.textContent = viewUrl;
 
         result.classList.remove("hidden");
+        result.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    result.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const targetEl = document.getElementById(btn.dataset.copyTarget);
+            if (!targetEl) return;
+
+            await navigator.clipboard.writeText(targetEl.href);
+
+            const original = btn.textContent;
+            btn.textContent = "Kopiert!";
+            btn.classList.add("copied");
+
+            setTimeout(() => {
+                btn.textContent = original;
+                btn.classList.remove("copied");
+            }, 1500);
+        });
     });
 
 }

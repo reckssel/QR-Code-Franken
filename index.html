@@ -47,15 +47,21 @@
 
             <div id="qr-code"></div>
 
-            <p>
-                <strong>Link im QR-Code (zum Anzeigen &amp; Bearbeiten):</strong><br>
-                <a id="edit-link" target="_blank" rel="noopener"></a>
-            </p>
+            <div>
+                <strong>Link im QR-Code (zum Anzeigen &amp; Bearbeiten)</strong>
+                <div class="link-row">
+                    <div><a id="edit-link" target="_blank" rel="noopener"></a></div>
+                    <button type="button" class="copy-btn" data-copy-target="edit-link">Kopieren</button>
+                </div>
+            </div>
 
-            <p class="edit-hint">
-                <strong>Nur-Lese-Link (zum Teilen ohne Bearbeitungsrecht):</strong><br>
-                <a id="view-link" target="_blank" rel="noopener"></a>
-            </p>
+            <div class="edit-hint">
+                <strong>Nur-Lese-Link (zum Teilen ohne Bearbeitungsrecht)</strong>
+                <div class="link-row">
+                    <div><a id="view-link" target="_blank" rel="noopener"></a></div>
+                    <button type="button" class="copy-btn" data-copy-target="view-link">Kopieren</button>
+                </div>
+            </div>
 
         </div>
 

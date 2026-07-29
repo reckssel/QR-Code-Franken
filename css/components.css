@@ -1,59 +1,128 @@
 /* ==========================
-   Komponenten
+   Kopfbereich
    ========================== */
 
-/* Buttons */
+h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+h1::before {
+    content: "📋";
+    font-size: 1.4rem;
+}
+
+.subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.98rem;
+}
+
+/* ==========================
+   Buttons
+   ========================== */
 
 .btn-primary,
 .btn-secondary {
-    padding: 0.6rem 1rem;
-    border-radius: 6px;
-    font-weight: bold;
+    padding: 0.75rem 1.1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.96rem;
+    transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
 }
 
 .btn-primary {
-    background: #2563eb;
+    background: var(--color-primary);
     color: #fff;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(1px);
 }
 
 .btn-primary:disabled {
     opacity: 0.6;
     cursor: default;
+    box-shadow: none;
 }
 
 .btn-secondary {
-    background: #e5e7eb;
-    color: #111827;
+    background: var(--color-secondary);
+    color: var(--color-text);
+}
+
+.btn-secondary:hover {
+    background: var(--color-secondary-hover);
 }
 
 .remove-item {
-    padding: 0 0.6rem;
-    color: #dc2626;
+    padding: 0 0.7rem;
+    color: var(--color-danger);
     font-weight: bold;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s ease;
 }
 
-/* Formulare */
+.remove-item:hover {
+    background: var(--color-danger-soft);
+}
+
+.copy-btn {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: var(--color-primary-soft);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: background 0.15s ease;
+}
+
+.copy-btn:hover {
+    background: var(--color-secondary-hover);
+}
+
+.copy-btn.copied {
+    color: #16a34a;
+}
+
+/* ==========================
+   Formulare
+   ========================== */
 
 label {
-    font-weight: bold;
-    margin-top: 0.5rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    margin-top: 0.35rem;
 }
 
 input[type="text"] {
-    padding: 0.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
+    padding: 0.65rem 0.8rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
     width: 100%;
+    background: var(--color-surface);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.subtitle {
-    color: #4b5563;
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 
 .items {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.6rem;
 }
 
 .item-row {
@@ -67,37 +136,90 @@ input[type="text"] {
 
 .form-actions {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
 }
 
-/* Karten */
+/* ==========================
+   Ergebnis / QR-Karte
+   ========================== */
 
-.result,
-#edit-form {
-    padding: 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+.result h1,
+.result h2 {
+    font-size: 1.05rem;
 }
 
-/* Liste */
+.result strong {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+    font-weight: 700;
+}
 
-#liste li {
-    padding: 0.5rem;
-    background: #f3f4f6;
-    border-radius: 6px;
+.result a {
+    font-size: 0.9rem;
+    word-break: break-all;
+}
+
+.link-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    justify-content: space-between;
+}
+
+.link-row > div {
+    min-width: 0;
+    flex: 1;
 }
 
 .edit-hint {
+    font-size: 0.85rem;
+    color: var(--color-warning-text);
+    background: var(--color-warning-bg);
+    border: 1px solid var(--color-warning-border);
+    border-radius: var(--radius-sm);
+    padding: 0.7rem 0.9rem;
+}
+
+/* ==========================
+   Listenansicht
+   ========================== */
+
+#titel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#titel::before {
+    content: "📝";
+    font-size: 1.3rem;
+}
+
+#liste li {
+    padding: 0.7rem 0.9rem;
+    background: var(--color-secondary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+#liste li::before {
+    content: "•";
+    color: var(--color-primary);
+    font-weight: 900;
+}
+
+#liste:empty::after {
+    content: "Noch keine Einträge.";
+    color: var(--color-text-muted);
     font-size: 0.9rem;
-    color: #b45309;
 }
 
 #save-status {
     font-size: 0.9rem;
+    color: var(--color-text-muted);
 }
-
-/* Modale Fenster */
-
-
-/* QR-Code-Anzeige */

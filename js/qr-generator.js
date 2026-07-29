@@ -9,3 +9,15 @@ export function generateQRCode(text, element) {
     });
 
 }
+
+export function downloadQRCode(element, filename) {
+
+    const canvas = element.querySelector("canvas");
+    if (!canvas) return;
+
+    const link = document.createElement("a");
+    link.download = filename;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+
+}
