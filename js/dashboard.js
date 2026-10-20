@@ -269,6 +269,15 @@ function showLogin() {
 
 export async function initDashboardPage() {
 
+    const togglePasswordBtn = document.getElementById("toggle-password");
+    togglePasswordBtn.addEventListener("click", () => {
+        const show = authPassword.type === "password";
+        authPassword.type = show ? "text" : "password";
+        togglePasswordBtn.textContent = show ? "🙈" : "👁️";
+        togglePasswordBtn.setAttribute("aria-pressed", String(show));
+        togglePasswordBtn.setAttribute("aria-label", show ? "Passwort verbergen" : "Passwort anzeigen");
+    });
+
     const session = await getSession();
     if (session) {
         showDashboard();
